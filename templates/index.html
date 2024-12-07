@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Dashboard</title>
+    <script src="/static/js/htmx.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white shadow-lg">
+            <nav class="mt-10">
+                <a hx-get="/chat" hx-trigger="click" hx-target="#main-content"
+                    class="block px-6 py-3 hover:bg-gray-100">Chat</a>
+                <a hx-get="/journal" hx-trigger="click" hx-target="#main-content"
+                    class="block px-6 py-3 hover:bg-gray-100">Journal</a>
+                <a hx-get="/social" hx-trigger="click" hx-target="#main-content"
+                    class="block px-6 py-3 hover:bg-gray-100">Social Connections</a>
+                <a hx-get="/mood" hx-trigger="click" hx-target="#main-content"
+                    class="block px-6 py-3 hover:bg-gray-100">Mood Tracker</a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div id="main-content" class="flex-1 p-10">
+            Welcome to your personal dashboard!
+        </div>
+    </div>
+</body>
+
+</html>

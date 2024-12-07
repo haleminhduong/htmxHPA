@@ -1,0 +1,35 @@
+<div class="bg-white p-6 rounded-lg shadow">
+    <h2 class="text-2xl font-bold mb-4">Social Connections</h2>
+    <div class="grid grid-cols-3 gap-4">
+        <div class="border rounded-lg p-4">
+            <h3 class="font-bold">Family</h3>
+            <ul class="mt-2" id="family-list">
+                <!-- Dynamic content -->
+            </ul>
+            <button class="mt-2 text-blue-500" hx-get="/add-connection-form" hx-target="#family-list"
+                hx-swap="beforeend">
+                Add Family Member
+            </button>
+        </div>
+        <div class="border rounded-lg p-4">
+            <h3 class="font-bold">Friends</h3>
+            <ul class="mt-2" id="friends-list">
+                <!-- Dynamic content -->
+            </ul>
+            <button class="mt-2 text-blue-500" hx-get="/add-connection-form" hx-target="#friends-list"
+                hx-swap="beforeend">
+                Add Friend
+            </button>
+        </div>
+        <div class="border rounded-lg p-4">
+            <h3 class="font-bold">Professional</h3>
+            <ul class="mt-2" id="professional-list">
+                <!-- Dynamic content -->
+            </ul>
+            <button class="mt-2 text-blue-500" hx-get="/add-connection-form" hx-target="#professional-list"
+                hx-swap="beforeend">
+                Add Contact
+            </button>
+        </div>
+    </div>
+</div>
