@@ -3,3 +3,5 @@ fastapi-cli
 pydantic
 starlette
 jinja2
+python-multipart
+pymilvus

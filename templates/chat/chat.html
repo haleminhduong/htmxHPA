@@ -2,7 +2,7 @@
     <h2 class="text-2xl font-bold mb-4">Chat Assistant</h2>
     <div class="h-96 border rounded-lg p-4 mb-4 overflow-y-auto" id="chat-messages">
     </div>
-    <form class="flex gap-2" hx-post="/chat" hx-target="#chat-messages" hx-swap="beforeend">
+    <form class="flex gap-2" hx-post="/chat/send" hx-target="#chat-messages" hx-swap="beforeend">
         <input type="text" name="message" class="flex-1 border rounded px-3 py-2" placeholder="Type your message...">
         <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Send</button>
     </form>
