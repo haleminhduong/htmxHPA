@@ -58,20 +58,20 @@ class ChatDatabase:
         return messages
 
     def save_message(self, session_id: str, content: str, role: str):
-        """Save a message to the database"""
+        """Save a message to the database and return the message ID"""
         if role not in ['user', 'ai']:
             raise ValueError("Role must be either 'user' or 'ai'")
-
         conn = self.get_connection()
         c = conn.cursor()
-
         c.execute('''
             INSERT INTO messages (session_id, content, role) 
             VALUES (?, ?, ?)
         ''', (session_id, content, role))
-
+        message_id = c.lastrowid  # Get the ID of the inserted row
         conn.commit()
         conn.close()
+
+        return message_id
 
     def delete_chat_history(self, session_id: str):
         """Delete all messages for a given session"""

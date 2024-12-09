@@ -2,19 +2,18 @@ from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from datetime import datetime
-from database import db  # Import the database singleton
+from database import db
+from services.vector_service import VectorService
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
+vector_service = VectorService()
 
 
 @router.get("/chat", response_class=HTMLResponse)
 async def chat(request: Request):
-    # Generate a unique session ID if not exists
     if not request.session.get("chat_id"):
         request.session["chat_id"] = str(datetime.now().timestamp())
-
-    # Get chat history
     chat_history = db.get_chat_history(request.session["chat_id"])
     return templates.TemplateResponse(
         "/chat/chat.html",
@@ -35,13 +34,44 @@ async def chat_message(request: Request):
         session_id = request.session.get(
             "chat_id", str(datetime.now().timestamp()))
 
-        # Save user message with new column names
-        db.save_message(session_id, message, "user")
+        try:
+            # Save user message to database and get message ID
+            user_message_id = db.save_message(session_id, message, "user")
 
-        # Save AI response (placeholder)
+            # Only store vector if we have a valid message ID
+            if user_message_id:
+                # Create and store embedding for user message
+                user_embedding = vector_service.create_embedding(message)
+                vector_service.store_vector(
+                    entry_id=user_message_id,
+                    vector=user_embedding,
+                    collection_name="chat_messages"
+                )
+        except Exception as e:
+            print(f"Error saving user message: {str(e)}")
+            # Continue with chat even if vector storage fails
+
+        # Generate AI response (placeholder)
         ai_response = "This is an AI response placeholder. How can I help you today?"
-        db.save_message(session_id, ai_response, "ai")
 
+        try:
+            # Save AI response to database
+            ai_message_id = db.save_message(session_id, ai_response, "ai")
+
+            # Only store vector if we have a valid message ID
+            if ai_message_id:
+                # Create and store embedding for AI response
+                ai_embedding = vector_service.create_embedding(ai_response)
+                vector_service.store_vector(
+                    entry_id=ai_message_id,
+                    vector=ai_embedding,
+                    collection_name="chat_messages"
+                )
+        except Exception as e:
+            print(f"Error saving AI response: {str(e)}")
+            # Continue with chat even if vector storage fails
+
+        # Return HTML response
         html = f"""
         <div class="flex w-full mt-2 space-x-3 max-w-md ml-auto justify-end">
             <div>

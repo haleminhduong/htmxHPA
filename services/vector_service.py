@@ -1,4 +1,4 @@
-# /services/vector_service.py
+# services/vector_service.py
 from typing import List, Dict, Any
 from pymilvus import connections, Collection, CollectionSchema, FieldSchema, DataType, utility
 import os
@@ -132,3 +132,4 @@ class VectorService:
             raise
         finally:
             collection.release()
+
