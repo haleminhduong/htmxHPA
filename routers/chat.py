@@ -1,68 +1,47 @@
-from fastapi import APIRouter, Request, HTTPException, Depends
+from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from services.vector_service import VectorService
+from datetime import datetime
+from database import db  # Import the database singleton
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
-def get_vector_service():
-    service = VectorService()
-    try:
-        yield service
-    finally:
-        pass
-
-
 @router.get("/chat", response_class=HTMLResponse)
 async def chat(request: Request):
-    return templates.TemplateResponse("/chat/chat.html", {"request": request})
+    # Generate a unique session ID if not exists
+    if not request.session.get("chat_id"):
+        request.session["chat_id"] = str(datetime.now().timestamp())
+
+    # Get chat history
+    chat_history = db.get_chat_history(request.session["chat_id"])
+    return templates.TemplateResponse(
+        "/chat/chat.html",
+        {"request": request, "chat_history": chat_history}
+    )
 
 
 @router.post("/chat/send")
-async def chat_message(
-    request: Request,
-    vector_service: VectorService = Depends(get_vector_service)
-):
+async def chat_message(request: Request):
     try:
         data = await request.form()
         message = str(data["message"]).strip()
-
         if not message:
             raise HTTPException(
                 status_code=400, detail="Message cannot be empty")
 
-        # Create embedding and store user message
-        message_embedding = vector_service.create_embedding(message)
-        vector_service.store_message(
-            message=message,
-            is_ai=False,
-            vector=message_embedding
-        )
+        # Get or create session ID
+        session_id = request.session.get(
+            "chat_id", str(datetime.now().timestamp()))
 
-        # Search for similar messages
-        similar_messages = vector_service.search_similar(
-            vector=message_embedding,
-            limit=3
-        )
+        # Save user message with new column names
+        db.save_message(session_id, message, "user")
 
-        # Generate AI response based on context
-        ai_response = "This is an AI response placeholder. "
-        # > 1 because the first will be the current message
-        if similar_messages and len(similar_messages) > 1:
-            ai_response += f"I found {len(similar_messages) -
-                                      1} similar messages in our chat history."
+        # Save AI response (placeholder)
+        ai_response = "This is an AI response placeholder. How can I help you today?"
+        db.save_message(session_id, ai_response, "ai")
 
-        # Store AI response
-        ai_embedding = vector_service.create_embedding(ai_response)
-        vector_service.store_message(
-            message=ai_response,
-            is_ai=True,
-            vector=ai_embedding
-        )
-
-        # Generate HTML response
         html = f"""
         <div class="flex w-full mt-2 space-x-3 max-w-md ml-auto justify-end">
             <div>
@@ -80,7 +59,6 @@ async def chat_message(
         </div>
         """
         return HTMLResponse(html)
-
     except Exception as e:
         print(f"Chat error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

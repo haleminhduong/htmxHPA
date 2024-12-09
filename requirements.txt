@@ -5,3 +5,7 @@ starlette
 jinja2
 python-multipart
 pymilvus
+logging
+sqlalchemy
+python-dotenv
+itsdangerous
